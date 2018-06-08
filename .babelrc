@@ -1,0 +1,26 @@
+{
+  "minified": true,
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ],
+  "plugins": [
+    "transform-object-rest-spread"
+  ],
+  "env": {
+    "production": {
+      "presets": [
+        [
+          "minify",
+          {
+            "mangle": false,
+            "evaluate": false
+          }
+        ]
+      ]
+    }
+  }
+}

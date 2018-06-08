@@ -1,0 +1,32 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "airbnb",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "prettier"
+  ],
+  "parser": "babel-eslint",
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "linebreak-style": ["error", "unix"],
+    "no-param-reassign": 0,
+    "no-underscore-dangle": 0,
+    "no-bitwise": ["error", {
+      "allow": ["~"]
+    }]
+  },
+  "overrides": [
+    {
+      "files": ["src/graphql/loaders/*.loader.js"],
+      "rules": {
+        "no-use-before-define": 0
+      }
+    }
+  ]
+}
