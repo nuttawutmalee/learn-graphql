@@ -6,11 +6,16 @@ import {
   GraphQLEnumType,
 } from 'graphql';
 import { GraphQLDate } from 'graphql-iso-date';
-import AvatarType from '../avatar/avatar.type';
+import AvatarType, { AvatarInputType } from '../avatar/avatar.type';
 
 const UserStatusType = new GraphQLEnumType({
   name: 'UserStatus',
-  values: ['ACTIVE', 'INACTIVE', 'PENDING', 'BLOCKED'],
+  values: {
+    ACTIVE: {},
+    INACTIVE: {},
+    PENDING: {},
+    BLOCKED: {},
+  },
 });
 
 const UserType = new GraphQLObjectType({
@@ -52,7 +57,7 @@ export const UserInput = new GraphQLInputObjectType({
     name: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    avatar: { type: AvatarType },
+    avatar: { type: AvatarInputType },
   }),
 });
 

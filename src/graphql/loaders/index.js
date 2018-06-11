@@ -1,6 +1,9 @@
-import UserLoader
+import Userloaders from './user.loader';
 
-export const createLoaders = (authToken) => (
+const withAuthToken = fn => token => fn(token);
 
-);
+const createLoaders = authToken => ({
+  ...withAuthToken(Userloaders)(authToken),
+});
 
+export default createLoaders;

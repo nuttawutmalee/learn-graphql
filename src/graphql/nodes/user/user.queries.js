@@ -1,5 +1,4 @@
 import { GraphQLString, GraphQLList, GraphQLNonNull } from 'graphql';
-import User from '../../../models/user';
 import UserType from './user.type';
 
 const user = {
@@ -7,16 +6,19 @@ const user = {
   args: {
     username: { type: new GraphQLNonNull(GraphQLString) },
   },
-  resolve: (root, args, { UserLoader }) => UserLoader.load(args.username),
+  resolve: (root, args, { loaders }) =>
+    loaders.users.byUsernameLoader.load(args.username),
 };
 
 const users = {
   type: new GraphQLList(UserType),
   args: {
-    username: { type: GraphQLString },
-    email: { type: GraphQLString },
+    usernames: {
+      type: new GraphQLNonNull(GraphQLList(GraphQLNonNull(GraphQLString))),
+    },
   },
-  resolve: (root, args) => User.find(args).then(result => result),
+  resolve: (root, args, { loaders }) =>
+    loaders.users.byUsernameLoader.loadMany(args.usernames),
 };
 
 export default {

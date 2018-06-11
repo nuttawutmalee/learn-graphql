@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { Router } from 'express';
 import schema from './schema';
-import { createLoaders } from './loaders';
+import createLoaders from './loaders';
 
 const middlewares = [
   bodyParser.json(),
@@ -24,7 +24,7 @@ graphqlRouter.use(
     schema,
     graphiql: true,
     context: {
-      Loaders: createLoaders(req.token),
+      loaders: createLoaders(req.token),
     },
   })),
 );
