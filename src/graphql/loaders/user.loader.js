@@ -36,6 +36,4 @@ export const UserByIDLoader = new DataLoader(async ids => {
   }
 });
 
-export default {
-  
-}
+export default UserByIDLoader;

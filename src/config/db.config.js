@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import Debug from 'debug';
 import mongoose from 'mongoose';
+
 import config from './app.config';
 
 const debug = Debug('app:config:db');

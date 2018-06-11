@@ -9,11 +9,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
+      minlength: 4,
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
       match: [
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         'Email address not valid.',
@@ -22,7 +25,24 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      match: [
+        /^((?=.*[A-Z])(?=.*[!@#$%^&*()_+=\-{}<>[\]])(?=.*[0-9])(?=.*[a-z]).{8,})$/,
+        'Password must have at least 8 characters, and consists of lowercase characters (a-z), uppercase characters(A-Z), special characters and numbers.',
+      ],
     },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    avatar: { data: Buffer, contentType: String },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'INACTIVE', 'PENDING', 'BLOCKED'],
+      uppercase: true,
+      default: 'PENDING',
+    },
+    verficationToken: String,
   },
   {
     collection: 'Users',

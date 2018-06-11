@@ -1,4 +1,6 @@
 import Debug from 'debug';
+import passport from 'passport';
+import auth from './auth';
 import config from './config/app.config';
 import server from './config/server.config';
 import db from './config/db.config';
@@ -10,7 +12,13 @@ server.get('/health-check', (req, res) => {
   res.send('Server is up and running!');
 });
 
-server.use(graphqlRoutes);
+server.use('/auth', auth);
+
+if (config.NODE_ENV === 'development') {
+  server.use(graphqlRoutes);
+} else {
+  server.use(passport.authenticate('local', { session: false }), graphqlRoutes);
+}
 
 db.connection.on('error', () => {
   throw new Error('Unable to connect to database');

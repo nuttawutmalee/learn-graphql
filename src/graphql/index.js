@@ -3,7 +3,6 @@ import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { Router } from 'express';
 import schema from './schema';
 import { createLoaders } from './loaders';
-import UserLoader from './loaders/user.loader';
 
 const middlewares = [
   bodyParser.json(),
@@ -16,21 +15,18 @@ const middlewares = [
   },
 ];
 
-const loaders = createLoaders()
-
 const graphqlRouter = Router();
 
 graphqlRouter.use(
   '/graphql',
   ...middlewares,
-  graphqlExpress({
+  graphqlExpress(req => ({
     schema,
     graphiql: true,
     context: {
-      loaders
-      UserLoader,
+      Loaders: createLoaders(req.token),
     },
-  }),
+  })),
 );
 
 graphqlRouter.use(

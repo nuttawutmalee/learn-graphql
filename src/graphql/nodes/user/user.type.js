@@ -3,10 +3,18 @@ import {
   GraphQLString,
   GraphQLInputObjectType,
   GraphQLNonNull,
+  GraphQLEnumType,
 } from 'graphql';
+import { GraphQLDate } from 'graphql-iso-date';
+import AvatarType from '../avatar/avatar.type';
+
+const UserStatusType = new GraphQLEnumType({
+  name: 'UserStatus',
+  values: ['ACTIVE', 'INACTIVE', 'PENDING', 'BLOCKED'],
+});
 
 const UserType = new GraphQLObjectType({
-  name: 'user',
+  name: 'User',
   fields: () => ({
     _id: { type: GraphQLString },
     username: {
@@ -18,11 +26,19 @@ const UserType = new GraphQLObjectType({
     password: {
       type: new GraphQLNonNull(GraphQLString),
     },
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    avatar: { type: AvatarType },
+    status: { type: UserStatusType },
+    verificationToken: { type: GraphQLString },
+    createdAt: { type: GraphQLDate },
+    updatedAt: { type: GraphQLDate },
   }),
 });
 
 export const UserInput = new GraphQLInputObjectType({
-  name: 'userInput',
+  name: 'UserInput',
   fields: () => ({
     username: {
       type: new GraphQLNonNull(GraphQLString),
@@ -33,6 +49,10 @@ export const UserInput = new GraphQLInputObjectType({
     password: {
       type: new GraphQLNonNull(GraphQLString),
     },
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    avatar: { type: AvatarType },
   }),
 });
 
