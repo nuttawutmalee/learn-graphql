@@ -1,0 +1,13 @@
+[ignore]
+.*/node_modules/bcryptjs/src/bower.json
+
+[include]
+
+[libs]
+./custom-definitions/
+
+[lints]
+
+[options]
+
+[strict]

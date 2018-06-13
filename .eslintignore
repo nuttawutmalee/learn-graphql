@@ -2,4 +2,6 @@
 
 /test/*
 /dist/*
+/flow-typed/*
+/custom-typed/
 check-version.js
