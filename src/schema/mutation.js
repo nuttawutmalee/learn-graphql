@@ -2,7 +2,11 @@
 
 import { GraphQLObjectType } from 'graphql';
 
+import userMutation from './user/user.mutation';
+
 export default new GraphQLObjectType({
   name: 'Mutation',
-  fields: {},
+  fields: {
+    ...userMutation,
+  },
 });

@@ -4,10 +4,11 @@
 import { nodeDefinitions, fromGlobalId } from 'graphql-relay';
 
 import { assignType, getType } from '../utils';
+import type GraphQLContext from '../context';
 
 export const { nodeInterface, nodeField, nodesField } = nodeDefinitions(
   // A function that maps from a global id to an object.
-  (globalId, context) => {
+  (globalId, context: GraphQLContext) => {
     const { type, id } = fromGlobalId(globalId);
 
     switch (type) {

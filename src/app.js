@@ -7,13 +7,19 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import compression from 'compression';
 import passport from 'passport';
-import PrettyError from 'pretty-error';
+import errorHandler from 'strong-error-handler';
 
 import config from './config';
-import auth from './auth';
+import authRoutes from './auth';
 import graphqlRoutes from './graphql';
+import { report } from './errors';
 
 const app = express();
+
+// Setup passport strategies
+require('./passport');
+
+app.set('trust proxy', 'loopback');
 
 app.use(
   cors({
@@ -30,13 +36,19 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(helmet());
 
-const pe = new PrettyError();
-pe.skipNodeFiles();
-pe.skipPackage('express');
+app.get('/health-check', (req: express$Request, res: express$Response) => {
+  res.send('Server is up and running!');
+});
+
+app.use(authRoutes);
+
+if (config.NODE_ENV === 'production') {
+  app.use(passport.authenticate('jwt', { session: false }), graphqlRoutes);
+} else {
+  app.use(graphqlRoutes);
+}
 
 app.use(
   (
@@ -45,21 +57,16 @@ app.use(
     res: express$Response,
     next: express$NextFunction,
   ) => {
-    process.stderr.write(pe.render(err));
-    next();
+    report(err);
+    next(err);
   },
 );
 
-app.get('/health-check', (req: express$Request, res: express$Response) => {
-  res.send('Server is up and running!');
-});
-
-app.use('/auth', auth);
-
-if (config.NODE_ENV === 'production') {
-  app.use(passport.authenticate('local', { session: false }), graphqlRoutes);
-} else {
-  app.use(graphqlRoutes);
-}
+app.use(
+  errorHandler({
+    debug: config.NODE_ENV !== 'production',
+    log: false,
+  }),
+);
 
 export default app;

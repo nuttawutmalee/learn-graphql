@@ -1,7 +1,7 @@
 // @flow
 
 export default function assignType(type: string) {
-  return (obj: any) => {
+  return (obj: ?Object) => {
     if (obj) obj.__type = type;
     return obj;
   };

@@ -1,13 +1,19 @@
 // @flow
 
-import { GraphQLNonNull, GraphQLString, GraphQLList } from 'graphql';
+import { GraphQLNonNull, GraphQLString } from 'graphql';
+// import {
+//   connectionArgs,
+//   connectionFromPromisedArray,
+//   cursorToOffset,
+// } from 'graphql-relay';
 
 import UserType from './user.type';
-import type Context from '../../context';
+// import UserConnection from './user.connection';
+import type GraphQLContext from '../../context';
 
 const me = {
   type: UserType,
-  resolve: (root: any, args: any, ctx: Context) =>
+  resolve: (root: any, args: any, ctx: GraphQLContext) =>
     ctx.user && ctx.loaders.user.userById.load(ctx.user.id),
 };
 
@@ -18,23 +24,19 @@ const user = {
       type: new GraphQLNonNull(GraphQLString),
     },
   },
-  resolve: (root: any, args: any, ctx: Context) =>
+  resolve: (root: any, args: any, ctx: GraphQLContext) =>
     ctx.loaders.user.userById.load(args.id),
 };
 
-const users = {
-  type: new GraphQLList(UserType),
-  args: {
-    ids: {
-      type: new GraphQLList(GraphQLNonNull(GraphQLString)),
-    },
-  },
-  resolve: (root: any, args: any, ctx: Context) =>
-    ctx.loaders.user.userById.loadMany(args.ids),
-};
+// const users = {
+//   type: UserConnection.connectionType,
+//   args: connectionArgs,
+//   resolve: (root: any, args: any, ctx: GraphQLContext) => {
+
+//   },
+// };
 
 export default {
   me,
   user,
-  users,
 };

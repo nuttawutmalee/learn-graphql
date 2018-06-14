@@ -8,7 +8,7 @@ import config from './config';
 
 const debug = Debug('app:db');
 
-export default function connectDatabase() {
+export function connectDatabase() {
   return new Promise((resolve, reject) => {
     // Use bluebird Promise for mongoose Promise based APIs
     mongoose.Promise = Promise;
@@ -19,13 +19,15 @@ export default function connectDatabase() {
       .once('open', () => resolve(mongoose.connections[0]));
 
     mongoose.connect(
-      config.DB_HOST || 'mongodb://localhost:27017',
+      config.DB_HOST,
       {
-        user: config.DB_USER || '',
-        pass: config.DB_PASS || '',
-        dbName: config.DB_NAME || 'local',
+        user: config.DB_USER,
+        pass: config.DB_PASS,
+        dbName: config.DB_NAME,
         keepAlive: 120,
       },
     );
   });
 }
+
+export default mongoose;

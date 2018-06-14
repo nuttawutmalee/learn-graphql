@@ -3,18 +3,29 @@
 import { Router } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import { Strategy as LocalStrategy } from 'passport-local';
 
 import config from './config';
+import { UnauthorizedError } from './errors';
 import User, { type UserDoc } from './schema/user/user.model';
-import type { app$Request } from './type-definition';
+import type { app$Request } from './types';
 
 const authRouter = Router({ caseSensitive: true });
 
+/**
+ * Send auth json response.
+ * @param {Object} req
+ * @param {Object} res
+ */
 const respond = (req: app$Request, res: express$Response) => {
   res.json({ user: req.user, token: req.token });
 };
 
+/**
+ * Generate signed JWT token.
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ */
 const generateToken = (
   req: app$Request,
   res: express$Response,
@@ -25,14 +36,20 @@ const generateToken = (
     return next(err);
   }
 
-  req.token = jwt.sign({ id: req.user._id }, config.APP || 'SUPERSECRETKEY', {
+  req.token = jwt.sign({ id: req.user._id }, config.APP_SECRET, {
     expiresIn: '7 days',
   });
 
   return next();
 };
 
-const register = (
+/**
+ * Register a new user to generate jwt token.
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ */
+const signup = (
   req: app$Request,
   res: express$Response,
   next: express$NextFunction,
@@ -48,39 +65,25 @@ const register = (
     .catch((err: Error) => next(err));
 };
 
-const verify = (
-  username: string,
-  password: string,
-  done: (err: any, user?: any, options?: { message: string }) => void,
+/**
+ * Authenticate using passport-local.
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ */
+const authenticate = (
+  req: app$Request,
+  res: express$Response,
+  next: express$NextFunction,
 ) => {
-  User.findOne({
-    $or: [{ username }, { email: username }],
-  })
-    .then((user: ?UserDoc) => {
-      if (!user) {
-        return done(null, false, { message: 'User not found' });
-      }
-
-      const pass = user.checkPassword(password);
-
-      if (!pass) {
-        return done(null, false, { message: 'Invalid password' });
-      }
-
-      return done(null, user);
-    })
-    .catch((err: Error) => done(err));
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (err) return next(err);
+    if (!user) return next(new UnauthorizedError(info.message));
+    return req.login(user, { session: false }, next);
+  })(req, res, next);
 };
 
-passport.use(new LocalStrategy({ session: false }, verify));
-
-authRouter.post(
-  '/login',
-  passport.authenticate('local', { session: false }),
-  generateToken,
-  respond,
-);
-
-authRouter.post('/register', register, generateToken, respond);
+authRouter.post('/signin', authenticate, generateToken, respond);
+authRouter.post('/signup', signup, generateToken, respond);
 
 export default authRouter;

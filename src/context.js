@@ -1,26 +1,31 @@
 // @flow
 
+import type DataLoader from 'dataloader';
+
 import { UnauthorizedError } from './errors';
-import type { app$Request } from './type-definition';
+import createLoaders from './schema/loader';
+import type { app$Request } from './types';
+import type { UserDoc } from './schema/user/user.model';
 
-// TODO: new loaders
-const createLoaders = () => null;
+type DataLoaders = {
+  [name: string]: DataLoader<any, any>,
+};
 
-class Context {
+type RootDataLoader = {
+  [model: string]: DataLoaders,
+};
+
+class GraphQLContext {
   req: app$Request;
-  loaders: any;
+  loaders: RootDataLoader;
 
   constructor(req: app$Request) {
     this.req = req;
     this.loaders = createLoaders();
   }
 
-  get user(): $ElementType<app$Request, 'user'> {
+  get user(): ?UserDoc {
     return this.req.user || null;
-  }
-
-  get token(): $ElementType<app$Request, 'token'> {
-    return this.req.token || null;
   }
 
   ensureIsAuthenticated() {
@@ -28,4 +33,4 @@ class Context {
   }
 }
 
-export default Context;
+export default GraphQLContext;

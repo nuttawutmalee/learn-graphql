@@ -2,10 +2,11 @@
 
 import Promise from 'bluebird';
 
-export default function createPromiseCallback(): (
-  err: any,
-  data: any,
-) => void & { promise: Promise<any> } {
+type AsyncCallback = (err: any, result: any) => void;
+
+type AsyncPromiseCallback = AsyncCallback & { promise: Promise<any> };
+
+export default function createPromiseCallback(): AsyncPromiseCallback {
   let cb: Object = {};
 
   const promise = new Promise((resolve, reject) => {

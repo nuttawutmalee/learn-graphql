@@ -1,4 +1,5 @@
-// @flow
+/* @flow */
+/* eslint-disable func-names */
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
@@ -70,14 +71,6 @@ export class UserDoc extends mongoose.Model {
    * Virtuals
    */
 
-  get password(): string {
-    return this.password;
-  }
-
-  set password(password: string) {
-    this.password = bcrypt.hashSync(password);
-  }
-
   /**
    * Statics
    */
@@ -114,6 +107,12 @@ export class UserDoc extends mongoose.Model {
 /**
  * Hooks & Validations
  */
+
+UserSchema.pre('save', function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = bcrypt.hashSync(this.password);
+  return next();
+});
 
 UserSchema.loadClass(UserDoc);
 

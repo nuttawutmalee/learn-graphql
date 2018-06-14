@@ -9,8 +9,9 @@
     "flow"
   ],
   "plugins": [
+    "transform-class-properties",
     "transform-object-rest-spread",
-    "transform-strip-types"
+    "transform-flow-strip-types"
   ],
   "env": {
     "production": {

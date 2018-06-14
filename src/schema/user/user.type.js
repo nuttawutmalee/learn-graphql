@@ -27,6 +27,10 @@ export default new GraphQLObjectType({
   fields: {
     id: globalIdField(),
 
+    _id: {
+      type: GraphQLString,
+    },
+
     username: {
       type: new GraphQLNonNull(GraphQLString),
     },

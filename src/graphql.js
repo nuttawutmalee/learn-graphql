@@ -6,10 +6,10 @@ import { printSchema } from 'graphql';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { apolloUploadExpress } from 'apollo-upload-server';
 
-import Context from './context';
+import GraphQLContext from './context';
 import schema from './schema';
 import config from './config';
-import type { app$Request } from './type-definition';
+import type { app$Request } from './types';
 
 const helperMiddlewares = [
   bodyParser.json(),
@@ -30,7 +30,7 @@ graphqlRouter.use(
   apolloUploadExpress(),
   graphqlExpress((req: app$Request) => ({
     schema,
-    context: new Context(req),
+    context: new GraphQLContext(req),
     graphiql: config.NODE_ENV !== 'production',
     pretty: config.NODE_ENV !== 'production',
   })),
@@ -45,7 +45,7 @@ if (config.NODE_ENV !== 'production') {
   );
 
   graphqlRouter.get(
-    '/graphql/schema',
+    '/graphiql/schema',
     (req: express$Request, res: express$Response) => {
       res.type('text/plain').send(printSchema(schema));
     },
