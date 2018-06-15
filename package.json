@@ -8,7 +8,9 @@
   },
   "scripts": {
     "start": "nodemon --exec babel-node ./src/index.js",
-    "build": "npm run clean:dist && babel src --out-dir dist --ignore spec.js,test.js",
+    "build": "npm run clean:dist && npm run build:babel && npm run build:flow",
+    "build:babel": "babel src --out-dir dist --ignore spec.js,test.js,types.js",
+    "build:flow": "flow-copy-source --ignore spec.js,test.js src dist",
     "clean:dist": "rimraf dist",
     "lint": "eslint .",
     "requirements-check": "node check-version.js",
@@ -38,6 +40,7 @@
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-react": "^7.9.1",
     "flow-bin": "^0.74.0",
+    "flow-copy-source": "^2.0.0",
     "flow-typed": "^2.4.0",
     "nodemon": "^1.17.5",
     "prettier": "1.13.4",
