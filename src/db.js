@@ -8,7 +8,7 @@ import config from './config';
 
 const debug = Debug('app:db');
 
-export function connectDatabase() {
+export function connectDatabase(): Promise<Mongoose$Connection> {
   return new Promise((resolve, reject) => {
     // Use bluebird Promise for mongoose Promise based APIs
     mongoose.Promise = Promise;

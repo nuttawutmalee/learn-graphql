@@ -475,6 +475,11 @@ declare class Mongoose$Connection {
   ): Class<Doc>;
   collection(name: string): Mongoose$Collection;
   modelNames(): string[];
+  host: string;
+  name: string;
+  port: string;
+  pass: string;
+  user: string;
   config: Object;
   db: any;
   collections: Mongoose$Collection[];

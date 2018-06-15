@@ -3,6 +3,12 @@
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import fs from 'fs';
+import path from 'path';
+import mkdirp from 'mkdirp';
+
+import Avatar, { AvatarDoc, AvatarSchema } from '../avatar/avatar.model';
+import { getUniqueFilename, sanitizeFilename } from '../../utils';
 
 /**
  * Schema
@@ -16,6 +22,7 @@ export const UserSchema = new mongoose.Schema(
       trim: true,
       minlength: 4,
     },
+
     email: {
       type: String,
       required: true,
@@ -26,6 +33,7 @@ export const UserSchema = new mongoose.Schema(
         'Email address not valid.',
       ],
     },
+
     password: {
       type: String,
       required: true,
@@ -34,17 +42,24 @@ export const UserSchema = new mongoose.Schema(
         'Password must have at least 8 characters, and consists of lowercase characters (a-z), uppercase characters(A-Z), special characters and numbers.',
       ],
     },
-    name: {
+
+    displayName: {
       type: String,
       required: true,
       trim: true,
     },
+
+    avatar: {
+      type: AvatarSchema,
+    },
+
     status: {
       type: String,
       enum: ['ACTIVE', 'INACTIVE', 'PENDING', 'BLOCKED'],
       uppercase: true,
       default: 'PENDING',
     },
+
     verificationToken: String,
   },
   {
@@ -56,6 +71,39 @@ export const UserSchema = new mongoose.Schema(
   },
 );
 
+// START TODO: Make it more generic and reusable
+const avatarDir = '/storage/avatars';
+const uploadDir = path.join(process.cwd(), 'resources', avatarDir);
+
+mkdirp.sync(uploadDir);
+
+const storeFS = ({ stream, filename }) => {
+  const sanitized = sanitizeFilename(filename);
+  const saveName = getUniqueFilename(sanitized);
+  const savePath = path.join(uploadDir, saveName);
+  const avatarPath = path.join(avatarDir, saveName);
+
+  return new Promise((resolve, reject) =>
+    stream
+      .on('error', err => {
+        if (stream.truncated) {
+          fs.unlinkSync(savePath);
+        }
+        reject(err);
+      })
+      .pipe(fs.createWriteStream(savePath))
+      .on('error', err => reject(err))
+      .on('finish', () => resolve(avatarPath)),
+  );
+};
+
+const processUpload = async upload => {
+  const { stream, filename, mimetype, encoding } = await upload;
+  const savePath = await storeFS({ stream, filename });
+  return { filename, mimetype, encoding, path: savePath };
+};
+// END TODO
+
 /**
  * Document
  */
@@ -63,7 +111,8 @@ export class UserDoc extends mongoose.Model {
   username: string;
   email: string;
   password: string;
-  name: string;
+  displayName: string;
+  avatar: ?AvatarDoc;
   status: string;
   verificationToken: ?string;
 
@@ -77,7 +126,7 @@ export class UserDoc extends mongoose.Model {
 
   /**
    * Get user by id.
-   * @param {ObjectId} id - The objectId of user.
+   * @param {ObjectId} id The objectId of user
    * @returns {Promise<User>}
    */
   static get(id: MongoId): Promise<UserDoc> {
@@ -88,6 +137,26 @@ export class UserDoc extends mongoose.Model {
         const err = new Error('User not found');
         return Promise.reject(err);
       });
+  }
+
+  /**
+   * Register user and create a new object.
+   * @param {Object} data User object data
+   * @returns {Promise<User>}
+   */
+  static async signup(data: any): Promise<UserDoc> {
+    const { avatar, ...userData } = data;
+
+    if (!avatar) {
+      return this.create(userData);
+    }
+
+    try {
+      const avatarData = await processUpload(avatar);
+      return this.create({ ...userData, avatar: new Avatar(avatarData) });
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   /**

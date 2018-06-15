@@ -9,7 +9,9 @@ import {
 import { GraphQLDate } from 'graphql-iso-date';
 import { globalIdField } from 'graphql-relay';
 
+import AvatarType from '../avatar/avatar.type';
 import { nodeInterface } from '../node';
+import type GraphQLContext from '../../context';
 
 export const UserStatusType = new GraphQLEnumType({
   name: 'UserStatus',
@@ -28,7 +30,7 @@ export default new GraphQLObjectType({
     id: globalIdField(),
 
     _id: {
-      type: GraphQLString,
+      type: new GraphQLNonNull(GraphQLString),
     },
 
     username: {
@@ -47,8 +49,14 @@ export default new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLString),
     },
 
+    avatar: {
+      type: AvatarType,
+      resolve: (parent: any, args: any, ctx: GraphQLContext) =>
+        ctx.loaders.avatar.avatarByUserId.load(parent.id),
+    },
+
     status: {
-      type: UserStatusType,
+      type: new GraphQLNonNull(UserStatusType),
     },
 
     verificationToken: {
@@ -56,11 +64,11 @@ export default new GraphQLObjectType({
     },
 
     createdAt: {
-      type: GraphQLDate,
+      type: new GraphQLNonNull(GraphQLDate),
     },
 
     updatedAt: {
-      type: GraphQLDate,
+      type: new GraphQLNonNull(GraphQLDate),
     },
   },
 });

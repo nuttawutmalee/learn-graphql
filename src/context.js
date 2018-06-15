@@ -1,23 +1,13 @@
 // @flow
 
-import type DataLoader from 'dataloader';
-
 import { UnauthorizedError } from './errors';
-import createLoaders from './schema/loader';
+import createLoaders, { type CreateLoaders } from './schema/loader';
 import type { app$Request } from './types';
 import type { UserDoc } from './schema/user/user.model';
 
-type DataLoaders = {
-  [name: string]: DataLoader<any, any>,
-};
-
-type RootDataLoader = {
-  [model: string]: DataLoaders,
-};
-
 class GraphQLContext {
   req: app$Request;
-  loaders: RootDataLoader;
+  loaders: $Call<CreateLoaders>;
 
   constructor(req: app$Request) {
     this.req = req;

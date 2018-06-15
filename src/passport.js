@@ -5,7 +5,7 @@ import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as LocalStrategy } from 'passport-local';
 
 import config from './config';
-import User, { type UserDoc } from './schema/user/user.model';
+import User from './schema/user/user.model';
 
 passport.use(
   new LocalStrategy(
@@ -20,7 +20,7 @@ passport.use(
       User.findOne({
         $or: [{ username }, { email: username }],
       })
-        .then((user: ?UserDoc) => {
+        .then(user => {
           if (!user) {
             return done(null, false, { message: 'User not found' });
           }
@@ -33,7 +33,7 @@ passport.use(
 
           return done(null, user);
         })
-        .catch((err: Error) => done(err));
+        .catch(err => done(err));
     },
   ),
 );
@@ -46,14 +46,16 @@ passport.use(
     },
     (jwtPayload: any, done: (err: any, user?: any, options?: any) => void) => {
       User.findById(jwtPayload.id)
-        .then((user: ?UserDoc) => {
+        .then(user => {
           if (!user) {
             return done(null, false, { message: 'User not found' });
           }
 
           return done(null, user);
         })
-        .catch((err: Error) => done(err));
+        .catch(err => done(err));
     },
   ),
 );
+
+export default passport;

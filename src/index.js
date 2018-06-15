@@ -20,12 +20,12 @@ const debug = Debug('app:server');
 
   const { APP_HOST, APP_PORT } = config;
 
-  const server = app.listen(APP_PORT, APP_HOST, () => {
+  const server = app.listen(Number(APP_PORT), APP_HOST, () => {
     debug(`Server is listenting on http://${APP_HOST}:${APP_PORT}/`);
   });
 
   // Shutdown NodeJS gracefully.
-  const handleExit = (options, err: any) => {
+  const handleExit = (options, err?: any) => {
     if (options.cleanup) {
       const actions = [db.disconnect];
 

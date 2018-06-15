@@ -1,6 +1,7 @@
 // @flow
 
 import { GraphQLString } from 'graphql';
+import { GraphQLUpload } from 'apollo-upload-server';
 import { mutationWithClientMutationId } from 'graphql-relay';
 
 import User from './user.model';
@@ -17,8 +18,11 @@ const inputFields = {
   password: {
     type: GraphQLString,
   },
-  name: {
+  displayName: {
     type: GraphQLString,
+  },
+  avatar: {
+    type: GraphQLUpload,
   },
 };
 
@@ -33,7 +37,7 @@ const createUser = mutationWithClientMutationId({
   inputFields,
   outputFields,
   mutateAndGetPayload: (input: any, ctx: GraphQLContext) =>
-    User.create(input)
+    User.signup(input)
       .then(user => ctx.loaders.user.userById.load(user.id))
       .then(user => ({ user })),
 });

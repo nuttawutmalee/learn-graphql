@@ -18,7 +18,7 @@ class UserLoader {
   userByUsername = new DataLoader(usernames =>
     User.find({ username: { $in: usernames } }).then(
       mapTo(usernames, x => {
-        this.userById.prime(x._id, x);
+        this.userById.prime(x.id, x);
         return x.username;
       }),
     ),

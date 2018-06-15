@@ -3,10 +3,11 @@
 import PrettyError from 'pretty-error';
 
 const pe = new PrettyError();
+
 pe.skipNodeFiles();
 pe.skipPackage('express');
 
-export const report = (err: Error) => {
+export const report = (err: any) => {
   // eslint-disable-next-line no-console
   console.log(pe.render(err));
 };

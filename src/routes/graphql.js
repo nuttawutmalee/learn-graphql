@@ -6,10 +6,10 @@ import { printSchema } from 'graphql';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import { apolloUploadExpress } from 'apollo-upload-server';
 
-import GraphQLContext from './context';
-import schema from './schema';
-import config from './config';
-import type { app$Request } from './types';
+import GraphQLContext from '../context';
+import schema from '../schema';
+import config from '../config';
+import type { app$Request } from '../types';
 
 const helperMiddlewares = [
   bodyParser.json(),

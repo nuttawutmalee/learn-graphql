@@ -14,15 +14,21 @@ export const { nodeInterface, nodeField, nodesField } = nodeDefinitions(
     switch (type) {
       case 'User':
         return context.loaders.user.userById.load(id).then(assignType('User'));
+      case 'Avatar':
+        return context.loaders.avatar.avatarById
+          .load(id)
+          .then(assignType('Avatar'));
       default:
         return null;
     }
   },
   // A function that maps from an object to a type.
-  obj => {
+  (obj: any) => {
     switch (getType(obj)) {
       case 'User':
         return require('./user/user.type').default;
+      case 'Avatar':
+        return require('./avatar/avatar.type').default;
       default:
         return null;
     }

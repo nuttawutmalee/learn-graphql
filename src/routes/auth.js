@@ -4,28 +4,17 @@ import { Router } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 
-import config from './config';
-import { UnauthorizedError } from './errors';
-import User, { type UserDoc } from './schema/user/user.model';
-import type { app$Request } from './types';
+import config from '../config';
+import { UnauthorizedError } from '../errors';
+import User from '../schema/user/user.model';
+import type { app$Request } from '../types';
 
 const authRouter = Router({ caseSensitive: true });
 
-/**
- * Send auth json response.
- * @param {Object} req
- * @param {Object} res
- */
 const respond = (req: app$Request, res: express$Response) => {
   res.json({ user: req.user, token: req.token });
 };
 
-/**
- * Generate signed JWT token.
- * @param {Object} req
- * @param {Object} res
- * @param {Function} next
- */
 const generateToken = (
   req: app$Request,
   res: express$Response,
@@ -43,34 +32,19 @@ const generateToken = (
   return next();
 };
 
-/**
- * Register a new user to generate jwt token.
- * @param {Object} req
- * @param {Object} res
- * @param {Function} next
- */
 const signup = (
   req: app$Request,
   res: express$Response,
   next: express$NextFunction,
 ) => {
-  const user = new User(req.body);
-
-  user
-    .save()
-    .then((savedUser: UserDoc) => {
-      req.user = savedUser || null;
+  User.signup(req.body)
+    .then(user => {
+      req.user = user || null;
       return next();
     })
-    .catch((err: Error) => next(err));
+    .catch(err => next(err));
 };
 
-/**
- * Authenticate using passport-local.
- * @param {Object} req
- * @param {Object} res
- * @param {Function} next
- */
 const authenticate = (
   req: app$Request,
   res: express$Response,
